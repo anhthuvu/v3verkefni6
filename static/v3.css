@@ -1,0 +1,31 @@
+* {
+    box-sizing: border-box;
+}
+body {
+	font: 400 1em/1.5 "Open Sans", sans-serif;
+}
+.head, .foot {
+	border:1px solid grey;
+	border-radius: 5px;
+	color: #0000b3;
+	text-align: center;
+}
+main {
+	background-image: linear-gradient(to bottom, #C2E9FB, #A1C4FD);
+}
+img {
+	max-width: 100%;
+	height: auto;
+}
+@media screen and (min-width: 48em) {  
+	body {  
+		margin: 0 auto;
+	}
+	.col-2 {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		grid-column-gap: 2em;
+		max-width: 60em;
+		margin: 0 auto;
+		padding: 0;
+	}
