@@ -6,11 +6,31 @@ frettir = [
 	["1", "Katrín og Pence hittast í Keflavík", "Mike Pence, varaforseti Bandaríkjanna, er í heimsókn á Íslandi í dag. Gríðarleg öryggisgæsla er í Reykjavík og á Keflavíkurflugvelli vegna heimsóknarinnar. Pence hefur hitt bæði Guðna Th. Jóhannesson, forseta Íslands, og Guðlaug Þór Þórðarson utanríkisráðherra í Höfða í dag. Dagur B. Eggertsson borgarstjóri sýndi Pence svo húsið. Pence fundar í kvöld á Keflavíkurflugvelli, meðal annars með Guðlaugi Þór og Katrínu Jakobsdóttur forsætisráðherra. (thuvu0512@gmail.com)"],
 	["2", "Þægilegur sigur á Moldóvu", "Íslenska karlalandsliðið í fótbolta vann 3-0 sigur Moldóvu í undankeppni EM 2020 á Laugardalsvelli í dag. Sigurinn skaut Íslandi á topp riðils síns en Tyrkir og Frakkar geta farið upp fyrir strákana okkar með sigri í sínum leikjum í kvöld. (thuvu0512@gmail.com)"]
 	]
+kennitala = [
+	["Anh Thu Vu:", "0512023170"],
+	["Yolanda Sanchez:", "1507023560"]
+	]
 
 @app.route('/')
 def index():
+	return render_template('index.tpl')
+
+@app.route('/a')
+def lidura():
+	print(len(kennitala))
+	return render_template('lidura.tpl', kennitala=kennitala)
+
+@app.route('/sida/<kt>')
+def kt(kt):
+	summa = 0
+	for id in kt:
+		summa = summa + int(id)
+	return render_template('kt.tpl', kt=kt, summa=summa )
+	
+@app.route('/b')
+def lidurb():
 	print(type(frettir))
-	return render_template("index.tpl", frettir=frettir)
+	return render_template('lidurb.tpl', frettir=frettir)
 
 @app.route('/frett/<int:id>')
 def frett(id):

@@ -8,7 +8,7 @@
         </div>
         <div>
             <p>{{ frett[2] }}</p>
-            <p><a href="/">Heimasíða</a></p>
+            <p><a href="/b">Fréttasíða</a></p>
         </div>
      </div>
 {% endblock content %}
