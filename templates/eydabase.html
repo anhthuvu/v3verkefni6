@@ -10,6 +10,7 @@
 <body>
 	<div>
 		{% include "header.tpl" ignore missing %}
+		{% block refresh %}{% endblock %}
 		<main>{% block content %}{% endblock %}</main>
 		{% include "footer.tpl" ignore missing %}
 	</div>

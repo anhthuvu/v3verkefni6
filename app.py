@@ -1,44 +1,90 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, session, request, redirect, url_for
 app = Flask(__name__)
+app.config['SECRET_KEY'] = "hcy148"
+SESSION_TYPE = 'redis'
+app.config.from_object(__name__)
 
-frettir = [
-	["0", "Schumacher í „leynilegri meðferð“ í París", "Þýski ökuþórinn Michael Schumacher er sagður hafa verið lagður inn á Pompidou-sjúkrahúsið í París í dag. Franska blaðið Le Parisien segist hafa heimildir fyrir því að Schumacher eigi að gangast undir stofnfrumumeðferð hjá franska skurðlækninum Philippe Menasche. Schumacher hefur ekki sést opinberlega eftir að hann slasaðist alvarlega á höfði í skíðaslysi í frönsku ölpunum fyrir fimm árum. ""(thuvu0512@gmail.com)"],
-	["1", "Katrín og Pence hittast í Keflavík", "Mike Pence, varaforseti Bandaríkjanna, er í heimsókn á Íslandi í dag. Gríðarleg öryggisgæsla er í Reykjavík og á Keflavíkurflugvelli vegna heimsóknarinnar. Pence hefur hitt bæði Guðna Th. Jóhannesson, forseta Íslands, og Guðlaug Þór Þórðarson utanríkisráðherra í Höfða í dag. Dagur B. Eggertsson borgarstjóri sýndi Pence svo húsið. Pence fundar í kvöld á Keflavíkurflugvelli, meðal annars með Guðlaugi Þór og Katrínu Jakobsdóttur forsætisráðherra. (thuvu0512@gmail.com)"],
-	["2", "Þægilegur sigur á Moldóvu", "Íslenska karlalandsliðið í fótbolta vann 3-0 sigur Moldóvu í undankeppni EM 2020 á Laugardalsvelli í dag. Sigurinn skaut Íslandi á topp riðils síns en Tyrkir og Frakkar geta farið upp fyrir strákana okkar með sigri í sínum leikjum í kvöld. (thuvu0512@gmail.com)"]
-	]
-kennitala = [
-	["Anh Thu Vu:", "0512023170"],
-	["Yolanda Sanchez:", "1507023560"]
+vorur = [
+	[0, "Sa Sa", 520],
+	[1, "Zha Zha", 1314],
+	[2, "Xu Xu", 520],
+	[3, "Rong Rong", 999],
+	[4, "Ke Ke", 9420],
+	[5, "Juan Juan", 8084]
 	]
 
 @app.route('/')
 def index():
-	return render_template('index.tpl')
+	return render_template('index.tpl', vorur=vorur)
 
-@app.route('/a')
-def lidura():
-	print(len(kennitala))
-	return render_template('lidura.tpl', kennitala=kennitala)
+@app.route('/add/<int:id>')
+def add(id):
+	karfa = []
+	fjoldi = 0
+	if "karfa" in session:
+		karfa = session['karfa']
+		karfa.append(vorur[id])
+		session['karfa'] = karfa
+		fjoldi = len(karfa)
+	else:
+		karfa.append(vorur[id])
+		session['karfa'] = karfa
+		fjoldi = len(karfa)
+	return render_template('index.tpl', vorur=vorur, fjoldi=fjoldi)
 
-@app.route('/sida/<kt>')
-def kt(kt):
+@app.route('/karfa')
+def karfa():
+	karfa = []
 	summa = 0
-	for id in kt:
-		summa = summa + int(id)
-	return render_template('kt.tpl', kt=kt, summa=summa )
-	
-@app.route('/b')
-def lidurb():
-	print(type(frettir))
-	return render_template('lidurb.tpl', frettir=frettir)
+	if "karfa" in session:
+		karfa = session['karfa']
+		fjoldi = len(karfa)
+		for x in karfa:
+			summa += int(x[2])
+		return render_template('karfa.tpl', karfa=karfa, tom=False, fjoldi=fjoldi, summa=summa)
+	else:
+		return render_template('karfa.tpl', karfa=karfa, tom=True)
 
-@app.route('/frett/<int:id>')
-def frett(id):
-    return render_template('frett.tpl', frett=frettir[id], nr=id)
+@app.route('/eydavoru/<int:id>')
+def eydavoru(id):
+	karfa = []
+	index = 0
+	karfa = session['karfa']
+	for x in range(len(karfa)):
+		if karfa[x][0] == id:
+			index = x
+	karfa.remove(karfa[index])
+	session['karfa'] = karfa
+	return render_template('eydavoru.tpl')
+
+@app.route('/eyda')
+def eyda():
+	session.pop('karfa', None)
+	return render_template('eyda.tpl')
+
+@app.route('/result', methods = ['POST'])
+def result():
+	if request.method == 'POST':
+		kwargs = {
+			'name': request.form['nafn'],
+			'email': request.form['email'],
+			'phone': request.form['simi'],
+			'price': request.form['samtals']
+		}
+		return render_template('result.tpl', **kwargs)
+
+@app.route('/logout', methods = ['GET', 'POST'])
+def logout():
+	session.pop('karfa', None)
+	return redirect(url_for('index'))
 
 @app.errorhandler(404)
 def error404(error):
-	return '<h1>ERRORRRRRRRRRRRRRR</h1>', 404
+	return render_template('error404.tpl'), 404
+
+@app.errorhandler(405)
+def error404(error):
+	return render_template('error405.tpl'), 405
 
 if __name__ == "__main__":
 	app.run(debug=True)

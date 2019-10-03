@@ -1,0 +1,105 @@
+* {
+    box-sizing: border-box;
+}
+body {
+	font: 400 1em/1.5 "Open Sans", sans-serif;
+	text-align: center;
+}
+.head, .foot {
+	border:1px solid grey;
+	border-radius: 5px;
+	color: #0000b3;
+	background-image: linear-gradient(to bottom, #C2E9FB, #A1C4FD);
+	text-align: center;
+}
+.nav {
+	text-align: center;
+}
+h2 {
+	color: white;
+}
+.block {
+	display: block;
+	border: 1px solid grey;
+	border-radius: 5px;
+    margin: .5em;
+    background-image: linear-gradient(to bottom, #C2E9FB, #A1C4FD);
+}
+form {
+    margin-bottom: 1em;
+    border: 1px solid #aaa;
+    border-radius: .5em;
+    padding: 1em;
+    margin: 1.5em auto;
+    width: 57%;
+    text-align: left;
+}
+table {
+	margin: 0 auto;
+}
+table td, #customers th {
+  border: 1px solid #ddd;
+  padding: 5px;
+}
+table tr:nth-child(even){background-color: #F0F8FF;}
+
+table tr:hover {background-color: #ddd;}
+
+table th {
+	background-color: #A1C4FD;
+	color: white;
+}
+input[type=text], input[type=email], textarea {
+    display: block;
+    width: 96%;
+}
+
+input, select, textarea {
+    margin: 0 1em .5em 0;
+}
+.button {
+	background-color: #0000b3;
+	color: white;
+	display: inline-block;
+	border: 1px solid grey;
+	border-radius: 3px;
+}
+img {
+	max-width: 100%;
+	height: auto;
+}
+.mynd {
+	max-width: 300px;
+}
+.karfa {
+	margin-top: 2em;
+	max-width: 60px;
+}
+@media screen and (min-width: 48em) {  
+	body {  
+		margin: 0 auto;
+	}
+	.col-2 {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		grid-column-gap: 2em;
+		max-width: 60em;
+		margin: 0 auto;
+		padding: 0;
+	}
+	.col-3 {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		grid-column-gap: 2em;
+		margin: 0 auto;
+		padding: 0;
+	}
+@media screen and (min-width: 60em) {
+	.col-3 {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
+		grid-column-gap: 2em;
+		margin: 0 auto;
+		padding: 0;
+	}
+}
