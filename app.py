@@ -1,82 +1,56 @@
-from flask import Flask, render_template, session, request, redirect, url_for
-app = Flask(__name__)
-app.config['SECRET_KEY'] = "hcy148"
-SESSION_TYPE = 'redis'
-app.config.from_object(__name__)
+from flask import Flask, render_template, session, request, redirect, url_for, json
+import json, urllib
+from math import inf
+from datetime import datetime
+from requests import get
+with urllib.request.urlopen("https://apis.is/petrol") as url:
+    data = json.loads(url.read().decode())
 
-vorur = [
-	[0, "Sa Sa", 520],
-	[1, "Zha Zha", 1314],
-	[2, "Xu Xu", 520],
-	[3, "Rong Rong", 999],
-	[4, "Ke Ke", 9420],
-	[5, "Juan Juan", 8084]
-	]
+def find_lowest_prices(data):
+    lowest_petrol_price = [min(data['results'], key=lambda x: x['bensin95']), min(data['results'], key=lambda x: x[
+        'bensin95_discount'] if x['bensin95_discount'] is not None else inf)]
+    lowest_diesel_price = [min(data['results'], key=lambda x: x['diesel']), min(data['results'],
+                           key=lambda x: x['diesel_discount'] if x['diesel_discount'] is not None else inf)]
+
+    lowest_petrol_price = lowest_petrol_price[0] if lowest_petrol_price[0]['bensin95'] <= lowest_petrol_price[1]['bensin95_discount'] else lowest_petrol_price[1]
+    lowest_diesel_price = lowest_diesel_price[0] if lowest_diesel_price[0]['diesel'] <= lowest_diesel_price[1]['diesel_discount'] else lowest_diesel_price[1]
+
+    return lowest_petrol_price, lowest_diesel_price
+
+def format_time(data):
+    return datetime.strptime(data, '%Y-%m-%dT%H:%M:%S.%f').strftime('%d/%m/%Y Klukkan %H:%M')
+
+app = Flask(__name__)
+app.jinja_env.filters['format_time'] = format_time
+
+listcompany = []
+for upplysingar in data['results']:
+	if upplysingar['company'] not in listcompany:
+		listcompany.append(upplysingar ['company'])
 
 @app.route('/')
-def index():
-	return render_template('index.tpl', vorur=vorur)
+def index():	
+	data = json.loads(get('https://apis.is/petrol').content)
+	return render_template('index.tpl', listcompany=listcompany, data=data, lowestPrices=find_lowest_prices(data))
 
-@app.route('/add/<int:id>')
-def add(id):
-	karfa = []
+@app.route('/company/<company>')
+def comp(company=None):
+	listkey = []
 	fjoldi = 0
-	if "karfa" in session:
-		karfa = session['karfa']
-		karfa.append(vorur[id])
-		session['karfa'] = karfa
-		fjoldi = len(karfa)
-	else:
-		karfa.append(vorur[id])
-		session['karfa'] = karfa
-		fjoldi = len(karfa)
-	return render_template('index.tpl', vorur=vorur, fjoldi=fjoldi)
+	gogn = data['results']
+	for upplysingar in gogn:
+		listkey.append(upplysingar['key'])
+		if upplysingar['company'] == company:
+			fjoldi += 1
+	return render_template('company.tpl', fjoldi=fjoldi, gogn=gogn, company=company, listkey=listkey)
 
-@app.route('/karfa')
-def karfa():
-	karfa = []
-	summa = 0
-	if "karfa" in session:
-		karfa = session['karfa']
-		fjoldi = len(karfa)
-		for x in karfa:
-			summa += int(x[2])
-		return render_template('karfa.tpl', karfa=karfa, tom=False, fjoldi=fjoldi, summa=summa)
-	else:
-		return render_template('karfa.tpl', karfa=karfa, tom=True)
-
-@app.route('/eydavoru/<int:id>')
-def eydavoru(id):
-	karfa = []
-	index = 0
-	karfa = session['karfa']
-	for x in range(len(karfa)):
-		if karfa[x][0] == id:
-			index = x
-	karfa.remove(karfa[index])
-	session['karfa'] = karfa
-	return render_template('eydavoru.tpl')
-
-@app.route('/eyda')
-def eyda():
-	session.pop('karfa', None)
-	return render_template('eyda.tpl')
-
-@app.route('/result', methods = ['POST'])
-def result():
-	if request.method == 'POST':
-		kwargs = {
-			'name': request.form['nafn'],
-			'email': request.form['email'],
-			'phone': request.form['simi'],
-			'price': request.form['samtals']
-		}
-		return render_template('result.tpl', **kwargs)
-
-@app.route('/logout', methods = ['GET', 'POST'])
-def logout():
-	session.pop('karfa', None)
-	return redirect(url_for('index'))
+@app.route('/moreinfo/<key>')
+def stad(key):
+	data = json.loads(get('https://apis.is/petrol').content)
+	gogn = data['results']
+	for upplysingar in gogn:
+		if upplysingar['key'] == key:
+			return render_template('stadur.tpl', gogn=gogn, data=data, key=key)
 
 @app.errorhandler(404)
 def error404(error):

@@ -1,3 +1,3 @@
 <header class ="head">
-	{% include "teljari.tpl" %}
+	<h1> Söluaðilar eldsneytis á Íslandi </h1>
 </header>
