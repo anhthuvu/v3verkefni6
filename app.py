@@ -2,7 +2,6 @@ from flask import Flask, render_template, session, request, redirect, url_for, j
 import json, urllib
 from math import inf
 from datetime import datetime
-from requests import get
 with urllib.request.urlopen("https://apis.is/petrol") as url:
     data = json.loads(url.read().decode())
 
@@ -30,7 +29,9 @@ for upplysingar in data['results']:
 
 @app.route('/')
 def index():	
-	data = json.loads(get('https://apis.is/petrol').content)
+	#data = json.loads(get('https://apis.is/petrol').content)
+	with urllib.request.urlopen("https://apis.is/petrol") as url:
+		data = json.loads(url.read().decode())
 	return render_template('index.tpl', listcompany=listcompany, data=data, lowestPrices=find_lowest_prices(data))
 
 @app.route('/company/<company>')
@@ -46,8 +47,9 @@ def comp(company=None):
 
 @app.route('/moreinfo/<key>')
 def stad(key):
-	data = json.loads(get('https://apis.is/petrol').content)
-	gogn = data['results']
+	with urllib.request.urlopen("https://apis.is/petrol") as url:
+		data = json.loads(url.read().decode())
+		gogn = data['results']
 	for upplysingar in gogn:
 		if upplysingar['key'] == key:
 			return render_template('stadur.tpl', gogn=gogn, data=data, key=key)
